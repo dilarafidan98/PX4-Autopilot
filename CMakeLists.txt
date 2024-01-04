@@ -103,6 +103,8 @@ cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
 set(PX4_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" CACHE FILEPATH "PX4 source directory" FORCE)
 set(PX4_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}" CACHE FILEPATH "PX4 binary directory" FORCE)
+# Path to the ACADOS installation
+set(ACADOS_PATH /home/dilara/acados)
 
 list(APPEND CMAKE_MODULE_PATH ${PX4_SOURCE_DIR}/cmake)
 include(px4_parse_function_args)
@@ -358,9 +360,17 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${ep_base})
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${ep_base}/Install)
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${ep_base}/Install/lib)
 link_directories(${ep_base}/Install/lib)
+# Link directories for ACADOS, BLASFEO, and HPIPM
+link_directories(${ACADOS_PATH}/lib)
+link_directories(src/Acados_MPC/c_generated_code)
+link_directories(${ACADOS_PATH}/external/blasfeo/lib)
+link_directories(${ACADOS_PATH}/external/hpipm/lib)
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${ep_base}/Install/include)
 include_directories(${ep_base}/Install/include)
-
+# Include directories for ACADOS, BLASFEO, and HPIPM
+include_directories(${ACADOS_PATH}/include)
+include_directories(${ACADOS_PATH}/external/blasfeo/include)
+include_directories(${ACADOS_PATH}/external/hpipm/include)
 #=============================================================================
 # external modules
 #
@@ -416,6 +426,9 @@ add_library(parameters_interface INTERFACE)
 add_library(kernel_parameters_interface INTERFACE)
 add_library(events_interface INTERFACE)
 add_library(kernel_events_interface INTERFACE)
+add_library(${PROJECT_NAME} src/Acados_MPC/acados_quadcopter_mpc_solver.cpp ${GENERATED_C_CODE})
+
+
 
 include(px4_add_library)
 add_subdirectory(src/lib EXCLUDE_FROM_ALL)
@@ -444,9 +457,14 @@ if(${PX4_PLATFORM} STREQUAL "nuttx" AND NOT CONFIG_BUILD_FLAT)
 	target_link_libraries(kernel_parameters_interface INTERFACE parameters)
 	target_link_libraries(events_interface INTERFACE usr_events)
 	target_link_libraries(kernel_events_interface INTERFACE events)
+
+       # Link ACADOS, BLASFEO, and HPIPM to your project
+       target_link_libraries(px4 acados hpipm blasfeo)
 else()
 	target_link_libraries(parameters_interface INTERFACE parameters)
 	target_link_libraries(events_interface INTERFACE events)
+	# Link ACADOS, BLASFEO, and HPIPM to your project
+	target_link_libraries(px4 acados hpipm blasfeo)
 endif()
 
 # firmware added last to generate the builtin for included modules

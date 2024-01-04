@@ -43,6 +43,10 @@ using namespace matrix;
 using namespace time_literals;
 using math::radians;
 
+extern "C" {
+	#include "Acados_MPC/c_generated_code/acados_solver_quadcopter.h"
+}
+
 MulticopterRateControl::MulticopterRateControl(bool vtol) :
 	ModuleParams(nullptr),
 	WorkItem(MODULE_NAME, px4::wq_configurations::rate_ctrl),
