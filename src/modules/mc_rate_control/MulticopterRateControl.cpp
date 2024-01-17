@@ -215,7 +215,8 @@ MulticopterRateControl::Run()
 			}
 
 			//runMPC controller
-			acados_quadcopter qc_acados=acados_quadcopter();
+			//acados_quadcopter qc_acados=acados_quadcopter();
+			//qc_acados.set_init_state();
 
 			// run rate controller
 			const Vector3f att_control = _rate_control.update(rates, _rates_setpoint, angular_accel, dt, _maybe_landed || _landed);

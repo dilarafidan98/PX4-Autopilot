@@ -1,7 +1,7 @@
 #include "mpc_rate_solver.hpp"
 #include <px4_platform_common/defines.h>
 #include <iostream>
-
+#include "c_generated_code/acados_solver_quadcopter.h"
 #define NX     QUADCOPTER_NX
 #define NZ     QUADCOPTER_NZ
 #define NU     QUADCOPTER_NU
