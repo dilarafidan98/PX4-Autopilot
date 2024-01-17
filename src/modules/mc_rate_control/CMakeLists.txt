@@ -43,5 +43,8 @@ px4_add_module(
 		circuit_breaker
 		mathlib
 		RateControl
+		MPCRateControl
 		px4_work_queue
+
 	)
+

@@ -163,7 +163,7 @@ set(config_module_list)
 set(config_kernel_list)
 
 # Find Python
-find_package(PythonInterp 3)
+find_package(PythonInterp 3.8)
 # We have a custom error message to tell users how to install python3.
 if(NOT PYTHONINTERP_FOUND)
 	message(FATAL_ERROR "Python 3 not found. Please install Python 3:\n"
@@ -352,7 +352,8 @@ px4_generate_airframes_xml(BOARD ${PX4_BOARD})
 #
 set(ep_base ${PX4_BINARY_DIR}/external)
 set_property(DIRECTORY PROPERTY EP_BASE ${ep_base})
-
+# Path to the ACADOS installation
+set(ACADOS_SOURCE_DIR "/home/dilara/acados")
 # add external project install folders to build
 # add the directories so cmake won't warn
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${ep_base})
@@ -361,6 +362,20 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${ep_base}/Install/li
 link_directories(${ep_base}/Install/lib)
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${ep_base}/Install/include)
 include_directories(${ep_base}/Install/include)
+include_directories(
+
+  $ENV{ACADOS_SOURCE_DIR}/include
+  $ENV{ACADOS_SOURCE_DIR}/include/acados
+  $ENV{ACADOS_SOURCE_DIR}/include/blasfeo/include
+  $ENV{ACADOS_SOURCE_DIR}/include/hpipm/include
+)
+find_library(ACADOS_LIB
+  NAMES acados
+        hpipm
+        blasfeo
+  PATHS $ENV{ACADOS_SOURCE_DIR}/lib
+)
+
 
 #=============================================================================
 # external modules
@@ -445,6 +460,7 @@ if(${PX4_PLATFORM} STREQUAL "nuttx" AND NOT CONFIG_BUILD_FLAT)
 	target_link_libraries(kernel_parameters_interface INTERFACE parameters)
 	target_link_libraries(events_interface INTERFACE usr_events)
 	target_link_libraries(kernel_events_interface INTERFACE events)
+
 else()
 	target_link_libraries(parameters_interface INTERFACE parameters)
 	target_link_libraries(events_interface INTERFACE events)

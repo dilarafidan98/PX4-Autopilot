@@ -39,6 +39,7 @@
 #include <mathlib/math/Functions.hpp>
 #include <px4_platform_common/events.h>
 
+
 using namespace matrix;
 using namespace time_literals;
 using math::radians;
@@ -212,6 +213,9 @@ MulticopterRateControl::Run()
 				// TODO: send the unallocated value directly for better anti-windup
 				_rate_control.setSaturationStatus(saturation_positive, saturation_negative);
 			}
+
+			//runMPC controller
+			acados_quadcopter qc_acados=acados_quadcopter();
 
 			// run rate controller
 			const Vector3f att_control = _rate_control.update(rates, _rates_setpoint, angular_accel, dt, _maybe_landed || _landed);
