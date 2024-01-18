@@ -1,4 +1,4 @@
-#include "c_generated_code/acados_solver_quadcopter.h"
+#include <../ACADOS_C/c_generated_code/acados_solver_quadcopter.h>
 
 #include "acados/utils/types.h"
 #include "acados_c/ocp_nlp_interface.h"

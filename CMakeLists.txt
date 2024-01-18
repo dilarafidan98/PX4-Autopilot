@@ -354,6 +354,12 @@ set(ep_base ${PX4_BINARY_DIR}/external)
 set_property(DIRECTORY PROPERTY EP_BASE ${ep_base})
 # Path to the ACADOS installation
 set(ACADOS_SOURCE_DIR "/home/dilara/acados")
+#set(C_GENERATED_INCLUDE_DIR "src/lib/mpc_rate_control/c_generated_code")
+#set(C_GENERATED_LIB "src/lib/mpc_rate_control/c_generated_code/libacados_solver_quadcopter.so")
+set(C_GENERATED_INCLUDE_DIR "src/lib/ACADOS_C/c_generated_code")
+set(C_GENERATED_LIB "src/lib/ACADOS_C/c_generated_code/libacados_solver_quadcopter.so")
+
+#set(ACADOS_LIB "home/dilara/acados/lib")
 # add external project install folders to build
 # add the directories so cmake won't warn
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${ep_base})
@@ -368,6 +374,8 @@ include_directories(
   $ENV{ACADOS_SOURCE_DIR}/include/acados
   $ENV{ACADOS_SOURCE_DIR}/include/blasfeo/include
   $ENV{ACADOS_SOURCE_DIR}/include/hpipm/include
+  $ENV{C_GENERATED_INCLUDE_DIR}
+
 )
 find_library(ACADOS_LIB
   NAMES acados
@@ -375,6 +383,7 @@ find_library(ACADOS_LIB
         blasfeo
   PATHS $ENV{ACADOS_SOURCE_DIR}/lib
 )
+
 
 
 #=============================================================================
@@ -460,6 +469,9 @@ if(${PX4_PLATFORM} STREQUAL "nuttx" AND NOT CONFIG_BUILD_FLAT)
 	target_link_libraries(kernel_parameters_interface INTERFACE parameters)
 	target_link_libraries(events_interface INTERFACE usr_events)
 	target_link_libraries(kernel_events_interface INTERFACE events)
+	target_link_libraries(${PROJECT_NAME} ${ACADOS_LIB}
+)
+
 
 else()
 	target_link_libraries(parameters_interface INTERFACE parameters)

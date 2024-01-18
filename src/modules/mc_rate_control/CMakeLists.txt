@@ -36,6 +36,7 @@ px4_add_module(
 	MAIN mc_rate_control
 	COMPILE_FLAGS
 		${MAX_CUSTOM_OPT_LEVEL}
+
 	SRCS
 		MulticopterRateControl.cpp
 		MulticopterRateControl.hpp
@@ -45,9 +46,12 @@ px4_add_module(
 		RateControl
 		MPCRateControl
 		px4_work_queue
+		ACADOS_C
+
 
 
 	)
+
 
 
 
