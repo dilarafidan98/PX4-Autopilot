@@ -35,7 +35,7 @@
 
 #include <lib/rate_control/rate_control.hpp>
 #include <lib/mpc_rate_control/mpc_rate_solver.hpp>
-#include <lib/ACADOS_C/c_generated_code/acados_solver_quadcopter.h>
+#include <lib/ACADOS_C/c_generated_code/acados_solver_Quadcopter_model_ode.h>
 #include <lib/matrix/matrix/math.hpp>
 #include <lib/perf/perf_counter.h>
 #include <px4_platform_common/defines.h>
@@ -55,9 +55,11 @@
 #include <uORB/topics/parameter_update.h>
 #include <uORB/topics/rate_ctrl_status.h>
 #include <uORB/topics/vehicle_angular_velocity.h>
+#include <uORB/topics/vehicle_attitude.h>
 #include <uORB/topics/vehicle_control_mode.h>
 #include <uORB/topics/vehicle_land_detected.h>
 #include <uORB/topics/vehicle_rates_setpoint.h>
+#include <uORB/topics/vehicle_attitude_setpoint.h>
 #include <uORB/topics/vehicle_status.h>
 #include <uORB/topics/vehicle_thrust_setpoint.h>
 #include <uORB/topics/vehicle_torque_setpoint.h>
@@ -87,12 +89,12 @@ private:
 	/**
 	 * initialize some vectors/matrices from parameters
 	 */
-	void parameters_updated();
+	//void parameters_updated();
 
 	void updateActuatorControlsStatus(const vehicle_torque_setpoint_s &vehicle_torque_setpoint, float dt);
 
-	RateControl _rate_control; ///< class for rate control calculations
-	acados_quadcopter _mpc_quadcopter_control;/// class for mpc quadcopter rate control calculations
+	//RateControl _rate_control; ///< class for rate control calculations
+	acados_rate::acados_quadcopter _mpc_quadcopter_control;/// class for mpc quadcopter rate control calculations
 
 
 	uORB::Subscription _battery_status_sub{ORB_ID(battery_status)};
@@ -101,11 +103,13 @@ private:
 	uORB::Subscription _vehicle_control_mode_sub{ORB_ID(vehicle_control_mode)};
 	uORB::Subscription _vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};
 	uORB::Subscription _vehicle_rates_setpoint_sub{ORB_ID(vehicle_rates_setpoint)};
+	uORB::Subscription _vehicle_attitude_setpoint_sub{ORB_ID(vehicle_attitude_setpoint)};
 	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
 
 	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
 
 	uORB::SubscriptionCallbackWorkItem _vehicle_angular_velocity_sub{this, ORB_ID(vehicle_angular_velocity)};
+	uORB::SubscriptionCallbackWorkItem _vehicle_attitude_sub{this, ORB_ID(vehicle_attitude)};
 
 	uORB::Publication<actuator_controls_status_s>	_actuator_controls_status_pub{ORB_ID(actuator_controls_status_0)};
 	uORB::PublicationMulti<rate_ctrl_status_s>	_controller_status_pub{ORB_ID(rate_ctrl_status)};
@@ -158,11 +162,15 @@ private:
 		(ParamFloat<px4::params::MC_ACRO_R_MAX>) _param_mc_acro_r_max,
 		(ParamFloat<px4::params::MC_ACRO_P_MAX>) _param_mc_acro_p_max,
 		(ParamFloat<px4::params::MC_ACRO_Y_MAX>) _param_mc_acro_y_max,
-		(ParamFloat<px4::params::MC_ACRO_EXPO>) _param_mc_acro_expo,			/**< expo stick curve shape (roll & pitch) */
-		(ParamFloat<px4::params::MC_ACRO_EXPO_Y>) _param_mc_acro_expo_y,				/**< expo stick curve shape (yaw) */
-		(ParamFloat<px4::params::MC_ACRO_SUPEXPO>) _param_mc_acro_supexpo,		/**< superexpo stick curve shape (roll & pitch) */
-		(ParamFloat<px4::params::MC_ACRO_SUPEXPOY>) _param_mc_acro_supexpoy,		/**< superexpo stick curve shape (yaw) */
+		(ParamFloat<px4::params::MC_ACRO_EXPO>) _param_mc_acro_expo,
+		(ParamFloat<px4::params::MC_ACRO_EXPO_Y>) _param_mc_acro_expo_y,
+		(ParamFloat<px4::params::MC_ACRO_SUPEXPO>) _param_mc_acro_supexpo,
+		(ParamFloat<px4::params::MC_ACRO_SUPEXPOY>) _param_mc_acro_supexpoy,
 
 		(ParamBool<px4::params::MC_BAT_SCALE_EN>) _param_mc_bat_scale_en
 	)
+
+
+
+
 };

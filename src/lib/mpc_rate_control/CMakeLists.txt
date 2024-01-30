@@ -16,5 +16,7 @@ target_include_directories(MPCRateControl PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(MPCRateControl PRIVATE mathlib)
 target_link_libraries(MPCRateControl PUBLIC ${ACADOS_LIB})
 target_link_libraries(MPCRateControl PUBLIC ACADOS_C)
-target_link_libraries(MPCRateControl PUBLIC "/home/dilara/PX4-Autopilot/src/lib/ACADOS_C/c_generated_code/libacados_solver_quadcopter.so")
+target_link_libraries(MPCRateControl PUBLIC "/home/dilara/PX4-Autopilot/src/lib/ACADOS_C/c_generated_code/libacados_solver_Quadcopter_model_ode.so")
+target_link_libraries(MPCRateControl PUBLIC "/home/dilara/acados/lib/libblasfeo.so")
 
+px4_add_unit_gtest(SRC mpc_rate_solver_test.cpp LINKLIBS MPCRateControl)

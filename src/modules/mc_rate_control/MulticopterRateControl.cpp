@@ -38,7 +38,7 @@
 #include <mathlib/math/Limits.hpp>
 #include <mathlib/math/Functions.hpp>
 #include <px4_platform_common/events.h>
-
+#include <matrix/matrix/math.hpp>
 
 using namespace matrix;
 using namespace time_literals;
@@ -53,8 +53,8 @@ MulticopterRateControl::MulticopterRateControl(bool vtol) :
 {
 	_vehicle_status.vehicle_type = vehicle_status_s::VEHICLE_TYPE_ROTARY_WING;
 
-	parameters_updated();
-	_controller_status_pub.advertise();
+	//parameters_updated();
+	//_controller_status_pub.advertise();
 }
 
 MulticopterRateControl::~MulticopterRateControl()
@@ -69,11 +69,18 @@ MulticopterRateControl::init()
 		PX4_ERR("callback registration failed");
 		return false;
 	}
+	    // Register callback for vehicle_attitude
+        //if (!_vehicle_attitude_sub.registerCallback()) {
+        //        PX4_ERR("callback registration for vehicle_attitude failed");
+        //        return false;
+        //}
 
 	return true;
 }
 
-void
+//Parameter update for PID Control
+//----------------------------------------------------------------------------
+/*void
 MulticopterRateControl::parameters_updated()
 {
 	// rate control parameters
@@ -96,31 +103,46 @@ MulticopterRateControl::parameters_updated()
 	// manual rate control acro mode rate limits
 	_acro_rate_max = Vector3f(radians(_param_mc_acro_r_max.get()), radians(_param_mc_acro_p_max.get()),
 				  radians(_param_mc_acro_y_max.get()));
-}
+}*/
+
+//-------------------------------------------------------------------------------
 
 void
 MulticopterRateControl::Run()
 {
 	if (should_exit()) {
-		_vehicle_angular_velocity_sub.unregisterCallback();
+		// Unregister callback for vehicle_angular_velocity
+                _vehicle_angular_velocity_sub.unregisterCallback();
+
+                // added by dilara::Unregister callback for vehicle_attitude
+                //_vehicle_attitude_sub.unregisterCallback();
 		exit_and_cleanup();
 		return;
 	}
 
 	perf_begin(_loop_perf);
 
-	// Check if parameters have changed
-	if (_parameter_update_sub.updated()) {
+	//Commented because parameters are using by PID
+	//----------------------------------------------
+	/*if (_parameter_update_sub.updated()) {
 		// clear update
 		parameter_update_s param_update;
 		_parameter_update_sub.copy(&param_update);
 
 		updateParams();
 		parameters_updated();
-	}
+	}*/
+	// Check if parameters have changed
+
+	//----------------------------------------------------
+
+
 
 	/* run controller on gyro changes */
 	vehicle_angular_velocity_s angular_velocity;
+	//vehicle_attitude_s vehicle_angle;
+
+
 
 	if (_vehicle_angular_velocity_sub.update(&angular_velocity)) {
 
@@ -132,6 +154,10 @@ MulticopterRateControl::Run()
 
 		const Vector3f rates{angular_velocity.xyz};
 		const Vector3f angular_accel{angular_velocity.xyz_derivative};
+
+
+
+
 
 		/* check for updates in other topics */
 		_vehicle_control_mode_sub.update(&_vehicle_control_mode);
@@ -149,6 +175,8 @@ MulticopterRateControl::Run()
 
 		// use rates setpoint topic
 		vehicle_rates_setpoint_s vehicle_rates_setpoint{};
+		//added by Dilara
+		vehicle_attitude_setpoint_s vehicle_attitude_setpoint{};
 
 		if (_vehicle_control_mode.flag_control_manual_enabled && !_vehicle_control_mode.flag_control_attitude_enabled) {
 			// generate the rate setpoint from sticks
@@ -188,12 +216,15 @@ MulticopterRateControl::Run()
 		if (_vehicle_control_mode.flag_control_rates_enabled) {
 
 			// reset integral if disarmed
-			if (!_vehicle_control_mode.flag_armed || _vehicle_status.vehicle_type != vehicle_status_s::VEHICLE_TYPE_ROTARY_WING) {
-				_rate_control.resetIntegral();
-			}
+			//if (!_vehicle_control_mode.flag_armed || _vehicle_status.vehicle_type != vehicle_status_s::VEHICLE_TYPE_ROTARY_WING) {
+				//_rate_control.resetIntegral();
+			//}
+
+			//---------------------------------------------------------------------------------
 
 			// update saturation status from control allocation feedback
-			control_allocator_status_s control_allocator_status;
+
+			/*control_allocator_status_s control_allocator_status;
 
 			if (_control_allocator_status_sub.update(&control_allocator_status)) {
 				Vector<bool, 3> saturation_positive;
@@ -212,29 +243,62 @@ MulticopterRateControl::Run()
 
 				// TODO: send the unallocated value directly for better anti-windup
 				_rate_control.setSaturationStatus(saturation_positive, saturation_negative);
-			}
+			}*/
 
-			//runMPC controller
-			acados_quadcopter qc_acados=acados_quadcopter();
-			//qc_acados.set_init_state();
+                        //----------------------------------------------------------------------------------------
 
-			// run rate controller
-			const Vector3f att_control = _rate_control.update(rates, _rates_setpoint, angular_accel, dt, _maybe_landed || _landed);
+		       // run rate controller
+		       //-----------------------------------------------------------------------------------------------------
+			//const Vector3f att_control = _rate_control.update(rates, _rates_setpoint, angular_accel, dt, _maybe_landed || _landed);
+			//---------------------------------------------------------------------------------
 
-			// publish rate controller status
-			rate_ctrl_status_s rate_ctrl_status{};
-			_rate_control.getRateControlStatus(rate_ctrl_status);
-			rate_ctrl_status.timestamp = hrt_absolute_time();
-			_controller_status_pub.publish(rate_ctrl_status);
+
 
 			// publish thrust and torque setpoints
 			vehicle_thrust_setpoint_s vehicle_thrust_setpoint{};
 			vehicle_torque_setpoint_s vehicle_torque_setpoint{};
 
-			_thrust_setpoint.copyTo(vehicle_thrust_setpoint.xyz);
-			vehicle_torque_setpoint.xyz[0] = PX4_ISFINITE(att_control(0)) ? att_control(0) : 0.f;
-			vehicle_torque_setpoint.xyz[1] = PX4_ISFINITE(att_control(1)) ? att_control(1) : 0.f;
-			vehicle_torque_setpoint.xyz[2] = PX4_ISFINITE(att_control(2)) ? att_control(2) : 0.f;
+
+			if (_vehicle_attitude_setpoint_sub.update(&vehicle_attitude_setpoint)) {
+
+
+			        //run MPC rate Control
+		                acados_rate::acados_quadcopter qc_acados;
+
+				qc_acados.acadosinitialize();
+
+                                // Extract roll, pitch, and yaw from the setpoint
+                                float roll = vehicle_attitude_setpoint.roll_body;
+                                float pitch = vehicle_attitude_setpoint.pitch_body;
+                                float yaw = vehicle_attitude_setpoint.yaw_body;
+
+
+                                // Create a Vector3f object and assign roll, pitch, and yaw to it
+                                matrix::Vector3f rpy(roll, pitch, yaw);
+
+                                 // Now you can pass 'rpy' to other functions or use it as needed
+				 //runMPC controllercommander takeoff
+		                 qc_acados.set_init_state(rpy,rates);
+				 qc_acados.compute_control();
+				 matrix::Vector3f T =qc_acados.get_first_control_action();
+
+
+				_thrust_setpoint.copyTo(vehicle_thrust_setpoint.xyz);
+			         vehicle_torque_setpoint.xyz[0] = PX4_ISFINITE(T(0)) ? T(0) : 0.f;
+			         vehicle_torque_setpoint.xyz[1] = PX4_ISFINITE(T(1)) ? T(1) : 0.f;
+			         vehicle_torque_setpoint.xyz[2] = PX4_ISFINITE(T(2)) ? T(2) : 0.f;
+
+
+				 PX4_INFO("Torque values: X: %f, Y: %f, Z: %f", static_cast<double>(T(0)), static_cast<double>(T(1)), static_cast<double>(T(2)));
+
+                        }
+
+			/*			// publish rate controller status
+			rate_ctrl_status_s rate_ctrl_status{};
+			_rate_control.getRateControlStatus(rate_ctrl_status);
+			rate_ctrl_status.timestamp = hrt_absolute_time();
+			_controller_status_pub.publish(rate_ctrl_status);*/
+
 
 			// scale setpoints by battery status if enabled
 			if (_param_mc_bat_scale_en.get()) {
@@ -263,6 +327,7 @@ MulticopterRateControl::Run()
 			_vehicle_torque_setpoint_pub.publish(vehicle_torque_setpoint);
 
 			updateActuatorControlsStatus(vehicle_torque_setpoint, dt);
+
 
 		}
 	}

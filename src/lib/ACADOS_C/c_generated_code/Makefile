@@ -36,37 +36,28 @@
 
 # model
 MODEL_SRC=
-MODEL_SRC+= quadcopter_model/quadcopter_impl_dae_fun.c
-MODEL_SRC+= quadcopter_model/quadcopter_impl_dae_fun_jac_x_xdot_z.c
-MODEL_SRC+= quadcopter_model/quadcopter_impl_dae_jac_x_xdot_u_z.c
+MODEL_SRC+= Quadcopter_model_ode_model/Quadcopter_model_ode_expl_ode_fun.c
+MODEL_SRC+= Quadcopter_model_ode_model/Quadcopter_model_ode_expl_vde_forw.c
+MODEL_SRC+= Quadcopter_model_ode_model/Quadcopter_model_ode_expl_vde_adj.c
 MODEL_OBJ := $(MODEL_SRC:.c=.o)
 
 # optimal control problem - mostly CasADi exports
 OCP_SRC=
-OCP_SRC+= quadcopter_cost/quadcopter_cost_y_0_fun.c
-OCP_SRC+= quadcopter_cost/quadcopter_cost_y_0_fun_jac_ut_xt.c
-OCP_SRC+= quadcopter_cost/quadcopter_cost_y_0_hess.c
-OCP_SRC+= quadcopter_cost/quadcopter_cost_y_fun.c
-OCP_SRC+= quadcopter_cost/quadcopter_cost_y_fun_jac_ut_xt.c
-OCP_SRC+= quadcopter_cost/quadcopter_cost_y_hess.c
-OCP_SRC+= quadcopter_cost/quadcopter_cost_y_e_fun.c
-OCP_SRC+= quadcopter_cost/quadcopter_cost_y_e_fun_jac_ut_xt.c
-OCP_SRC+= quadcopter_cost/quadcopter_cost_y_e_hess.c
 
-OCP_SRC+= acados_solver_quadcopter.c
+OCP_SRC+= acados_solver_Quadcopter_model_ode.c
 OCP_OBJ := $(OCP_SRC:.c=.o)
 
 # for sim solver
-SIM_SRC= acados_sim_solver_quadcopter.c
+SIM_SRC= acados_sim_solver_Quadcopter_model_ode.c
 SIM_OBJ := $(SIM_SRC:.c=.o)
 
 # for target example
-EX_SRC= main_quadcopter.c
+EX_SRC= main_Quadcopter_model_ode.c
 EX_OBJ := $(EX_SRC:.c=.o)
 EX_EXE := $(EX_SRC:.c=)
 
 # for target example_sim
-EX_SIM_SRC= main_sim_quadcopter.c
+EX_SIM_SRC= main_sim_Quadcopter_model_ode.c
 EX_SIM_OBJ := $(EX_SIM_SRC:.c=.o)
 EX_SIM_EXE := $(EX_SIM_SRC:.c=)
 
@@ -83,10 +74,12 @@ INCLUDE_PATH = /home/dilara/acados/include
 LIB_PATH = /home/dilara/acados/lib
 
 # preprocessor flags for make's implicit rules
+CPPFLAGS += -DACADOS_WITH_QPOASES
 CPPFLAGS+= -I$(INCLUDE_PATH)
 CPPFLAGS+= -I$(INCLUDE_PATH)/acados
 CPPFLAGS+= -I$(INCLUDE_PATH)/blasfeo/include
 CPPFLAGS+= -I$(INCLUDE_PATH)/hpipm/include
+CPPFLAGS+= -I $(INCLUDE_PATH)/qpOASES_e/
 
 
 # define the c-compiler flags for make's implicit rules
@@ -102,11 +95,11 @@ LDLIBS+= -lacados
 LDLIBS+= -lhpipm
 LDLIBS+= -lblasfeo
 LDLIBS+= -lm
-LDLIBS+= 
+LDLIBS+= -lqpOASES_e
 
 # libraries
-LIBACADOS_SOLVER=libacados_solver_quadcopter.so
-LIBACADOS_OCP_SOLVER=libacados_ocp_solver_quadcopter.so
+LIBACADOS_SOLVER=libacados_solver_Quadcopter_model_ode.so
+LIBACADOS_OCP_SOLVER=libacados_ocp_solver_Quadcopter_model_ode.so
 LIBACADOS_SIM_SOLVER=lib$(SIM_SRC:.c=.so)
 
 # virtual targets
@@ -159,7 +152,7 @@ ocp_cython: ocp_cython_o
 	-o acados_ocp_solver_pyx.so \
 	-Wl,-rpath=$(LIB_PATH) \
 	acados_ocp_solver_pyx.o \
-	$(abspath .)/libacados_ocp_solver_quadcopter.so \
+	$(abspath .)/libacados_ocp_solver_Quadcopter_model_ode.so \
 	$(LDFLAGS) $(LDLIBS)
 
 # Sim Cython targets
@@ -186,7 +179,7 @@ sim_cython: sim_cython_o
 	-o acados_sim_solver_pyx.so \
 	-Wl,-rpath=$(LIB_PATH) \
 	acados_sim_solver_pyx.o \
-	$(abspath .)/libacados_sim_solver_quadcopter.so \
+	$(abspath .)/libacados_sim_solver_Quadcopter_model_ode.so \
 	$(LDFLAGS) $(LDLIBS)
 
 clean:
@@ -199,13 +192,13 @@ clean_ocp_shared_lib:
 	$(RM) $(OCP_OBJ)
 
 clean_ocp_cython:
-	$(RM) libacados_ocp_solver_quadcopter.so
-	$(RM) acados_solver_quadcopter.o
+	$(RM) libacados_ocp_solver_Quadcopter_model_ode.so
+	$(RM) acados_solver_Quadcopter_model_ode.o
 	$(RM) acados_ocp_solver_pyx.so
 	$(RM) acados_ocp_solver_pyx.o
 
 clean_sim_cython:
-	$(RM) libacados_sim_solver_quadcopter.so
-	$(RM) acados_sim_solver_quadcopter.o
+	$(RM) libacados_sim_solver_Quadcopter_model_ode.so
+	$(RM) acados_sim_solver_Quadcopter_model_ode.o
 	$(RM) acados_sim_solver_pyx.so
 	$(RM) acados_sim_solver_pyx.o

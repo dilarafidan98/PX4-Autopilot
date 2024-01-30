@@ -15,7 +15,7 @@ extern "C" {
   #define _CASADI_NAMESPACE_CONCAT(NS, ID) NS ## ID
   #define CASADI_PREFIX(ID) CASADI_NAMESPACE_CONCAT(CODEGEN_PREFIX, ID)
 #else
-  #define CASADI_PREFIX(ID) quadcopter_cost_y_hess_ ## ID
+  #define CASADI_PREFIX(ID) Quadcopter_model_ode_expl_ode_fun_ ## ID
 #endif
 
 #include <math.h>
@@ -33,8 +33,6 @@ extern "C" {
 #define casadi_s0 CASADI_PREFIX(s0)
 #define casadi_s1 CASADI_PREFIX(s1)
 #define casadi_s2 CASADI_PREFIX(s2)
-#define casadi_s3 CASADI_PREFIX(s3)
-#define casadi_s4 CASADI_PREFIX(s4)
 
 /* Symbol visibility in DLLs */
 #ifndef CASADI_SYMBOL_EXPORT
@@ -54,92 +52,102 @@ extern "C" {
 static const casadi_int casadi_s0[10] = {6, 1, 0, 6, 0, 1, 2, 3, 4, 5};
 static const casadi_int casadi_s1[7] = {3, 1, 0, 3, 0, 1, 2};
 static const casadi_int casadi_s2[3] = {0, 0, 0};
-static const casadi_int casadi_s3[13] = {9, 1, 0, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8};
-static const casadi_int casadi_s4[12] = {9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-/* quadcopter_cost_y_hess:(i0[6],i1[3],i2[],i3[9],i4[],i5[])->(o0[9x9,0nz]) */
+/* Quadcopter_model_ode_expl_ode_fun:(i0[6],i1[3],i2[])->(o0[6]) */
 static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw, casadi_real* w, int mem) {
+  casadi_real a0, a1;
+  a0=arg[0]? arg[0][3] : 0;
+  if (res[0]!=0) res[0][0]=a0;
+  a0=arg[0]? arg[0][4] : 0;
+  if (res[0]!=0) res[0][1]=a0;
+  a0=arg[0]? arg[0][5] : 0;
+  if (res[0]!=0) res[0][2]=a0;
+  a0=231.;
+  a1=arg[1]? arg[1][0] : 0;
+  a0=(a0*a1);
+  if (res[0]!=0) res[0][3]=a0;
+  a0=133.;
+  a1=arg[1]? arg[1][1] : 0;
+  a1=(a0*a1);
+  if (res[0]!=0) res[0][4]=a1;
+  a1=arg[1]? arg[1][2] : 0;
+  a0=(a0*a1);
+  if (res[0]!=0) res[0][5]=a0;
   return 0;
 }
 
-CASADI_SYMBOL_EXPORT int quadcopter_cost_y_hess(const casadi_real** arg, casadi_real** res, casadi_int* iw, casadi_real* w, int mem){
+CASADI_SYMBOL_EXPORT int Quadcopter_model_ode_expl_ode_fun(const casadi_real** arg, casadi_real** res, casadi_int* iw, casadi_real* w, int mem){
   return casadi_f0(arg, res, iw, w, mem);
 }
 
-CASADI_SYMBOL_EXPORT int quadcopter_cost_y_hess_alloc_mem(void) {
+CASADI_SYMBOL_EXPORT int Quadcopter_model_ode_expl_ode_fun_alloc_mem(void) {
   return 0;
 }
 
-CASADI_SYMBOL_EXPORT int quadcopter_cost_y_hess_init_mem(int mem) {
+CASADI_SYMBOL_EXPORT int Quadcopter_model_ode_expl_ode_fun_init_mem(int mem) {
   return 0;
 }
 
-CASADI_SYMBOL_EXPORT void quadcopter_cost_y_hess_free_mem(int mem) {
+CASADI_SYMBOL_EXPORT void Quadcopter_model_ode_expl_ode_fun_free_mem(int mem) {
 }
 
-CASADI_SYMBOL_EXPORT int quadcopter_cost_y_hess_checkout(void) {
+CASADI_SYMBOL_EXPORT int Quadcopter_model_ode_expl_ode_fun_checkout(void) {
   return 0;
 }
 
-CASADI_SYMBOL_EXPORT void quadcopter_cost_y_hess_release(int mem) {
+CASADI_SYMBOL_EXPORT void Quadcopter_model_ode_expl_ode_fun_release(int mem) {
 }
 
-CASADI_SYMBOL_EXPORT void quadcopter_cost_y_hess_incref(void) {
+CASADI_SYMBOL_EXPORT void Quadcopter_model_ode_expl_ode_fun_incref(void) {
 }
 
-CASADI_SYMBOL_EXPORT void quadcopter_cost_y_hess_decref(void) {
+CASADI_SYMBOL_EXPORT void Quadcopter_model_ode_expl_ode_fun_decref(void) {
 }
 
-CASADI_SYMBOL_EXPORT casadi_int quadcopter_cost_y_hess_n_in(void) { return 6;}
+CASADI_SYMBOL_EXPORT casadi_int Quadcopter_model_ode_expl_ode_fun_n_in(void) { return 3;}
 
-CASADI_SYMBOL_EXPORT casadi_int quadcopter_cost_y_hess_n_out(void) { return 1;}
+CASADI_SYMBOL_EXPORT casadi_int Quadcopter_model_ode_expl_ode_fun_n_out(void) { return 1;}
 
-CASADI_SYMBOL_EXPORT casadi_real quadcopter_cost_y_hess_default_in(casadi_int i) {
+CASADI_SYMBOL_EXPORT casadi_real Quadcopter_model_ode_expl_ode_fun_default_in(casadi_int i) {
   switch (i) {
     default: return 0;
   }
 }
 
-CASADI_SYMBOL_EXPORT const char* quadcopter_cost_y_hess_name_in(casadi_int i) {
+CASADI_SYMBOL_EXPORT const char* Quadcopter_model_ode_expl_ode_fun_name_in(casadi_int i) {
   switch (i) {
     case 0: return "i0";
     case 1: return "i1";
     case 2: return "i2";
-    case 3: return "i3";
-    case 4: return "i4";
-    case 5: return "i5";
     default: return 0;
   }
 }
 
-CASADI_SYMBOL_EXPORT const char* quadcopter_cost_y_hess_name_out(casadi_int i) {
+CASADI_SYMBOL_EXPORT const char* Quadcopter_model_ode_expl_ode_fun_name_out(casadi_int i) {
   switch (i) {
     case 0: return "o0";
     default: return 0;
   }
 }
 
-CASADI_SYMBOL_EXPORT const casadi_int* quadcopter_cost_y_hess_sparsity_in(casadi_int i) {
+CASADI_SYMBOL_EXPORT const casadi_int* Quadcopter_model_ode_expl_ode_fun_sparsity_in(casadi_int i) {
   switch (i) {
     case 0: return casadi_s0;
     case 1: return casadi_s1;
     case 2: return casadi_s2;
-    case 3: return casadi_s3;
-    case 4: return casadi_s2;
-    case 5: return casadi_s2;
     default: return 0;
   }
 }
 
-CASADI_SYMBOL_EXPORT const casadi_int* quadcopter_cost_y_hess_sparsity_out(casadi_int i) {
+CASADI_SYMBOL_EXPORT const casadi_int* Quadcopter_model_ode_expl_ode_fun_sparsity_out(casadi_int i) {
   switch (i) {
-    case 0: return casadi_s4;
+    case 0: return casadi_s0;
     default: return 0;
   }
 }
 
-CASADI_SYMBOL_EXPORT int quadcopter_cost_y_hess_work(casadi_int *sz_arg, casadi_int* sz_res, casadi_int *sz_iw, casadi_int *sz_w) {
-  if (sz_arg) *sz_arg = 6;
+CASADI_SYMBOL_EXPORT int Quadcopter_model_ode_expl_ode_fun_work(casadi_int *sz_arg, casadi_int* sz_res, casadi_int *sz_iw, casadi_int *sz_w) {
+  if (sz_arg) *sz_arg = 3;
   if (sz_res) *sz_res = 1;
   if (sz_iw) *sz_iw = 0;
   if (sz_w) *sz_w = 0;

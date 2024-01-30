@@ -1,4 +1,4 @@
-#include <../ACADOS_C/c_generated_code/acados_solver_quadcopter.h>
+#include <../ACADOS_C/c_generated_code/acados_solver_Quadcopter_model_ode.h>
 
 #include "acados/utils/types.h"
 #include "acados_c/ocp_nlp_interface.h"
@@ -10,10 +10,10 @@
 #include <uORB/topics/rate_ctrl_status.h>
 
 
-
+namespace acados_rate{
 class acados_quadcopter{
 	private:
-	   quadcopter_solver_capsule *acados_ocp_capsule;
+           Quadcopter_model_ode_solver_capsule *acados_ocp_capsule;
 	   ocp_nlp_config *nlp_config;
 	   ocp_nlp_dims *nlp_dims;
 	   ocp_nlp_in *nlp_in;
@@ -24,15 +24,13 @@ class acados_quadcopter{
 	   //add other values
 	public:
 	    int N;//number of shooting intervals
-	    double dt;//time interval
-	    acados_quadcopter();
-	    acados_quadcopter(int _N,double *_time_steps);
-	    acados_quadcopter(acados_quadcopter &&other);
-	    ~acados_quadcopter();
-	    acados_quadcopter &operator=(acados_quadcopter &&other);
 
-	    void set_init_state();
-	    void set_init_solution(matrix::Vector3f &initialx_angle,matrix::Vector3f &initialx_rate,matrix::Vector3f &initialu);
+
+	    acados_quadcopter();
+	    ~acados_quadcopter();
+	    bool acadosinitialize();
+	    void set_init_state(matrix::Vector3f initialx_angle, matrix::Vector3f initialx_rate);
+	    void set_init_solution(matrix::Vector3f initialx_angle,matrix::Vector3f initialx_rate);
 	    void set_all_init_solutions(double xtraj[],double utraj[]);
 	    void get_all_init_solutions(double xtraj[],double utraj[]);
 	    //void set_ref
@@ -53,3 +51,4 @@ class acados_quadcopter{
 
 
 
+}
