@@ -29,7 +29,7 @@
 #define QUADCOPTER_MODEL_ODE_NY0    9
 #define QUADCOPTER_MODEL_ODE_NY     9
 #define QUADCOPTER_MODEL_ODE_NYN    6
-#define QUADCOPTER_MODEL_ODE_N      30
+#define QUADCOPTER_MODEL_ODE_N      25
 #define QUADCOPTER_MODEL_ODE_NH     0
 #define QUADCOPTER_MODEL_ODE_NHN    0
 #define QUADCOPTER_MODEL_ODE_NH0    0
@@ -106,9 +106,6 @@ bool acados_quadcopter::acadosinitialize(){
 
 
 void acados_quadcopter::set_init_state(matrix::Vector3f initialx_angle, matrix::Vector3f initialx_rate) {
-
-
-
   // Print initialx_angle
         std::cout << "Initial X Angle: ["
                   << initialx_angle(0) << ", "
@@ -120,8 +117,6 @@ void acados_quadcopter::set_init_state(matrix::Vector3f initialx_angle, matrix::
                   << initialx_rate(0) << ", "
                   << initialx_rate(1) << ", "
                   << initialx_rate(2) << "]" << std::endl;
-
-
   int idxbx0[6];
   double lbx0[6];
   double ubx0[6];
@@ -149,27 +144,6 @@ void acados_quadcopter::set_init_state(matrix::Vector3f initialx_angle, matrix::
 
   ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, 0, "lbx", lbx0);
   ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, 0, "ubx", ubx0);
-
-  // ocp_nlp_out_set(nlp_config, nlp_dims, nlp_out, 0, "x", lbx0);
-
-  //quadcopter_acados_solve(acados_ocp_capsule);
-
-  // initial value for control input
-  /*double u0[3];
-   u0[0] = 0;
-   u0[1] = 0;
-   u0[2] = 0;
-
-   // initialize solution
-  for (int i = 0; i < N; i++) {
-
-    ocp_nlp_out_set(nlp_config, nlp_dims, nlp_out, i, "u", u0);
-  }*/
-
-
-
-
-
 
 }
 

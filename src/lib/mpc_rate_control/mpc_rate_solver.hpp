@@ -33,12 +33,12 @@ class acados_quadcopter{
 	    void set_init_solution(matrix::Vector3f initialx_angle,matrix::Vector3f initialx_rate);
 	    void set_all_init_solutions(double xtraj[],double utraj[]);
 	    void get_all_init_solutions(double xtraj[],double utraj[]);
-	    //void set_ref
+
 	    void compute_control();
 	    double get_elapsed_time();
 	    matrix::Vector3f get_first_control_action();
 	    void print_stats();
-	    //void setNewCosts
+
 
 
 };

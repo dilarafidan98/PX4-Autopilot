@@ -94,6 +94,7 @@ private:
 	void updateActuatorControlsStatus(const vehicle_torque_setpoint_s &vehicle_torque_setpoint, float dt);
 
 	//RateControl _rate_control; ///< class for rate control calculations
+
 	acados_rate::acados_quadcopter _mpc_quadcopter_control;/// class for mpc quadcopter rate control calculations
 
 

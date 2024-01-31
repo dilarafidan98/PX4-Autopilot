@@ -276,8 +276,8 @@ MulticopterRateControl::Run()
                                 // Create a Vector3f object and assign roll, pitch, and yaw to it
                                 matrix::Vector3f rpy(roll, pitch, yaw);
 
-                                 // Now you can pass 'rpy' to other functions or use it as needed
-				 //runMPC controllercommander takeoff
+                                // Now you can pass 'rpy' to other functions or use it as needed
+
 		                 qc_acados.set_init_state(rpy,rates);
 				 qc_acados.compute_control();
 				 matrix::Vector3f T =qc_acados.get_first_control_action();
